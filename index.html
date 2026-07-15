@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C++ 在线编译器 | WASM Playground</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- 顶部导航 -->
+    <header class="topbar">
+        <div class="topbar-left">
+            <div class="logo">
+                <span class="logo-icon">⚡</span>
+                <span class="logo-text">C++ Playground</span>
+            </div>
+            <span class="badge">WASM</span>
+        </div>
+        <div class="topbar-right">
+            <button class="btn-icon" id="themeToggle" title="切换主题">🌙</button>
+            <button class="btn-icon" id="fullscreenBtn" title="全屏">⛶</button>
+        </div>
+    </header>
+
+    <!-- 主内容区 -->
+    <main class="main-container">
+        <!-- 左侧面板 -->
+        <section class="panel left-panel">
+            <!-- 代码编辑器区域 -->
+            <div class="editor-container">
+                <div class="panel-header">
+                    <div class="tab-bar">
+                        <button class="tab active" data-file="main.cpp">
+                            <span class="tab-icon">📄</span> main.cpp
+                        </button>
+                        <button class="tab" data-file="utils.cpp">
+                            <span class="tab-icon">📄</span> utils.cpp
+                        </button>
+                        <button class="tab" data-file="header.h">
+                            <span class="tab-icon">📄</span> header.h
+                        </button>
+                    </div>
+                    <div class="header-actions">
+                        <select id="templateSelect" class="select-styled">
+                            <option value="basic">基础模板</option>
+                            <option value="input">输入示例</option>
+                            <option value="array">数组操作</option>
+                            <option value="class">类示例</option>
+                            <option value="algorithm">算法模板</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="editor-wrapper">
+                    <div class="line-numbers" id="lineNumbers"></div>
+                    <textarea 
+                        id="codeEditor" 
+                        class="code-editor" 
+                        spellcheck="false"
+                        placeholder="在此输入 C++ 代码..."
+                    ></textarea>
+                </div>
+            </div>
+
+            <!-- 输入区域 -->
+            <div class="input-container">
+                <div class="panel-header">
+                    <span class="panel-title">
+                        <span class="title-icon">📥</span> 标准输入 (stdin)
+                    </span>
+                    <div class="input-actions">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="autoFillInput" checked>
+                            <span class="checkmark"></span>
+                            自动填充
+                        </label>
+                        <button class="btn-small" id="clearInput">清空</button>
+                    </div>
+                </div>
+                <textarea 
+                    id="stdinInput" 
+                    class="stdin-editor" 
+                    placeholder="输入数据（将自动传递给程序）&#10;例如：&#10;10 20&#10;Hello World"
+                ></textarea>
+            </div>
+        </section>
+
+        <!-- 右侧面板 -->
+        <section class="panel right-panel">
+            <!-- 编译控制 -->
+            <div class="control-bar">
+                <button class="btn-compile" id="compileBtn">
+                    <span class="btn-icon">🔨</span>
+                    <span class="btn-text">编译并运行</span>
+                    <span class="btn-shortcut">Ctrl+Enter</span>
+                </button>
+                <button class="btn-secondary" id="clearAllBtn">
+                    <span class="btn-icon">🗑️</span> 清空
+                </button>
+                <div class="compiler-options">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="optimizeLevel">
+                        <span class="checkmark"></span>
+                        -O2 优化
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="warnLevel" checked>
+                        <span class="checkmark"></span>
+                        -Wall
+                    </label>
+                </div>
+            </div>
+
+            <!-- 状态栏 -->
+            <div class="status-bar" id="statusBar">
+                <div class="status-indicator">
+                    <span class="status-dot" id="statusDot"></span>
+                    <span class="status-text" id="statusText">就绪</span>
+                </div>
+                <div class="status-info">
+                    <span id="compileTime"></span>
+                    <span id="runTime"></span>
+                </div>
+            </div>
+
+            <!-- 输出区域 -->
+            <div class="output-container">
+                <div class="output-tabs">
+                    <button class="output-tab active" data-tab="compile">
+                        📋 编译日志
+                    </button>
+                    <button class="output-tab" data-tab="run">
+                        ▶️ 运行结果
+                    </button>
+                    <button class="output-tab" data-tab="all">
+                        📊 全部输出
+                    </button>
+                </div>
+
+                <div class="output-panel active" id="compilePanel">
+                    <pre class="output-content" id="compileLog">等待编译...</pre>
+                </div>
+
+                <div class="output-panel" id="runPanel">
+                    <pre class="output-content" id="runOutput">等待运行...</pre>
+                </div>
+
+                <div class="output-panel" id="allPanel">
+                    <pre class="output-content" id="allOutput">等待编译...</pre>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 底部状态栏 -->
+    <footer class="bottombar">
+        <span>🔒 纯前端编译 · 代码不会离开浏览器</span>
+        <span>📦 基于 WebAssembly</span>
+        <span>⚡ 即时编译</span>
+    </footer>
+
+    <!-- 加载动画 -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <p class="loading-text">正在初始化编译器...</p>
+            <p class="loading-subtext" id="loadingSubtext">首次加载可能需要几秒钟</p>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
